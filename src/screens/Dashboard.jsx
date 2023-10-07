@@ -11,14 +11,28 @@ import SortActions from '../components/Dashboard.jsx/SortActions';
 import Monitors from '../components/Dashboard.jsx/Monitors';
 import Loading2 from '../components/Loading2';
 import EditMonitor from '../components/Dashboard.jsx/EditMonitor';
+import UptimeEvents from '../components/Dashboard.jsx/UptimeEvents';
 const apiUrl = import.meta.env.VITE_SERVER_URL;
+import { Doughnut } from 'react-chartjs-2';
+import 'chart.js/auto';
+import moment from 'moment';
 
 function Dashboard() {
   const navigate = useNavigate()
   let [monitors, setMonitors] = useState([])
+  let [stats, setStats] = useState([])
+  let [load3, setLoad3] = useState(false)
+  let [percent, setPercent] = useState([])
+  let [load4, setLoad4] = useState(false)
+  let [down, setDown] = useState([])
+  let [load5, setLoad5] = useState(false)
   let [pickedMonitor, setPickedMonitors] = useState({})
   let [page, setPage] = useState(1)
   let [pages, setPages] = useState(1)
+  let [updown, setUpdown] = useState([])
+  let [page2, setPage2] = useState(1)
+  let [pages2, setPages2] = useState(1)
+  let [load2, setLoad2] = useState(false)
   const [sortByName,setSortByName] = useState('all'); 
   const [statusSort,setStatusSort] = useState('all');
   const [typeSort, setTypeSort] = useState('all');
@@ -40,9 +54,10 @@ function Dashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {console.log(token);} else {navigate('/login');}
+    if (token) {console.log(token)} else {navigate('/login');}
   }, [navigate]);
 
+  //fetch monitor data
   useEffect(() => {
     setLoad(true)
     const token = localStorage.getItem('token');
@@ -62,7 +77,7 @@ function Dashboard() {
       .then((response) => {
         if (response.status === 200) {
           // Data fetched successfully
-          console.log(response)
+          //console.log(response)
           setMonitors(response.data); // Assuming the response data contains the list of monitors
           setPages(response?.data?.totalPages)
           setLoad(false)
@@ -78,7 +93,136 @@ function Dashboard() {
       
   }, [page,reload]);
 
-  //console.log(monitors)
+  //fetch monitor uptime and downtime events
+  useEffect(() => {
+    setLoad2(true)
+    const token = localStorage.getItem('token');
+    // Make a POST request to the API
+    axios.post(`${apiUrl}/api/monitor/monitoring/updown`, {
+      token: token,
+      page: page2,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        
+        if (response.status === 200) {
+          // Data fetched successfully
+          //console.log(response)
+          setUpdown(response?.data?.events); // Assuming the response data contains the list of monitors
+          setPages2(response?.data?.totalPages)
+          setLoad2(false)
+        } else {
+          console.error('Failed to fetch monitors');
+          setLoad2(false)
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching monitors:', error);
+        setLoad2(false)
+      });
+      
+  }, [page2]);
+
+  //get stats data 
+  useEffect(() => {
+    setLoad3(true)
+    const token = localStorage.getItem('token');
+    // Make a POST request to the API
+    axios.post(`${apiUrl}/api/monitor/monitoring/stats`, {
+      token: token,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+          setStats(response.data); 
+          setLoad3(false)
+      })
+      .catch((error) => {
+        console.error('Error fetching stats:', error);
+        setLoad3(false)
+      });
+      
+  }, []);
+
+  //get % data 
+  useEffect(() => {
+    setLoad4(true)
+    const token = localStorage.getItem('token');
+    // Make a POST request to the API
+    axios.post(`${apiUrl}/api/monitor/monitoring/alluptimestats`, {
+      token: token,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        setPercent(response.data); 
+        
+          setLoad4(false)
+      })
+      .catch((error) => {
+        console.error('Error fetching stats:', error);
+        setLoad4(false)
+      });
+      
+  }, []);
+
+  //get latest downtime data 
+  useEffect(() => {
+    setLoad5(true)
+    const token = localStorage.getItem('token');
+    // Make a POST request to the API
+    axios.post(`${apiUrl}/api/monitor/monitoring/latest-downtime`, {
+      token: token,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        setDown(response.data); 
+        
+          setLoad5(false)
+      })
+      .catch((error) => {
+        console.error('Error fetching stats:', error);
+        setLoad5(false)
+      });
+      
+  }, []);
+
+
+  // Calculate the duration in hours and minutes
+  const duration = moment.duration(down?.duration);
+  const durationInHours = duration.hours();
+  const durationInMinutes = duration.minutes();
+
+
+  // Create data for the pie chart
+  const pieChartData = {
+    labels: ['Up', 'Down', 'Paused'],
+    datasets: [
+      {
+        data: [stats?.upMonitors, stats?.downMonitors, stats?.pausedMonitors],
+        backgroundColor: ['#388E3C', '#D32F2F', '#FFA001'], // Colors for each segment
+      },
+    ],
+  };
+
+  const chartOptions = {
+    plugins: {
+      legend: {
+        display: false, // Set to false to hide the legend
+      },
+    },
+    cutout: '80%', 
+  };
   
 
   return (
@@ -93,7 +237,7 @@ function Dashboard() {
           <div className="wrapper">
             <div className="dashboard-topbar__headline">
               <h1 className="dashboard-topbar__title">Quick Stats</h1>
-              <p className="dashboard-topbar__description">You are currently using 17 of your 50 monitors.</p>
+              <p className="dashboard-topbar__description">You are currently using {parseInt(stats?.upMonitors) + parseInt(stats?.downMonitors)} of your {parseInt(stats?.upMonitors) + parseInt(stats?.downMonitors) + parseInt(stats?.pausedMonitors)} monitors.</p>
             </div>
             <div className="dashboard-topbar__actions">
                       <button onClick={openModal} className="button button--color-green button--size-md button--icon-plus"><span className="button__inner">add new monitor</span></button>
@@ -109,16 +253,37 @@ function Dashboard() {
             <div className="widgets__item">
               <div className="widget-monitoring widget">
                 <header className="widget__header">
-                  <h2 className="widget__title">Monitoring Stats</h2><span className="widget__description">Stats of your 17 monitors</span>
+                  <h2 className="widget__title">Monitoring Stats</h2><span className="widget__description">Stats of your {17} monitors</span>
                 </header>
                 <div className="widget-monitoring__body widget__body">
-                  <div className="widget-monitoring__chart">
-                    <canvas id="monitoring-chart" width="82" height="82"></canvas>
+                  <div className="tw-m-auto">
+                  <Doughnut data={pieChartData} options={chartOptions} width={82} height={82} />
                   </div>
                   <ul className="widget-monitoring__stats">
-                    <li className="widget-monitoring__stats-item widget-monitoring__stats-item--up"><strong className="widget-monitoring__stats-item-title">12</strong><span className="widget-monitoring__stats-item-text"><span className="legend-pin legend-pin--green"></span>Up</span></li>
-                    <li className="widget-monitoring__stats-item widget-monitoring__stats-item--down"><strong className="widget-monitoring__stats-item-title">3</strong><span className="widget-monitoring__stats-item-text"><span className="legend-pin legend-pin--red"></span>Down</span></li>
-                    <li className="widget-monitoring__stats-item widget-monitoring__stats-item--paused"><strong className="widget-monitoring__stats-item-title">2</strong><span className="widget-monitoring__stats-item-text"><span className="legend-pin legend-pin--yellow"></span>Paused</span></li>
+                    <li className="widget-monitoring__stats-item widget-monitoring__stats-item--up"><strong className="widget-monitoring__stats-item-title">
+                      
+                      {
+                        load3 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
+                           {stats?.upMonitors}
+                        </>)
+                      }
+                      </strong><span className="widget-monitoring__stats-item-text"><span className="legend-pin legend-pin--green"></span>Up</span></li>
+                    <li className="widget-monitoring__stats-item widget-monitoring__stats-item--down"><strong className="widget-monitoring__stats-item-title">
+                      
+                      {
+                        load3 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
+                           {stats?.downMonitors}
+                        </>)
+                      }
+                      </strong><span className="widget-monitoring__stats-item-text"><span className="legend-pin legend-pin--red"></span>Down</span></li>
+                    <li className="widget-monitoring__stats-item widget-monitoring__stats-item--paused"><strong className="widget-monitoring__stats-item-title">
+                      
+                      {
+                        load3 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
+                           {stats?.pausedMonitors}
+                        </>)
+                      }
+                      </strong><span className="widget-monitoring__stats-item-text"><span className="legend-pin legend-pin--yellow"></span>Paused</span></li>
                   </ul>
                 </div>
               </div>
@@ -131,11 +296,29 @@ function Dashboard() {
                 <header className="widget__header">
                   <h2 className="widget__title">Overall Uptime</h2>
                 </header>
-                <div className="widget__body">
+                <div className="widget__body tw-mt-4">
                   <ul className="widget-uptime__stats">
-                    <li className="widget-uptime__stats-item"><strong className="widget-uptime__stats-item-title">66%</strong><span className="widget-uptime__stats-item-text">last 24 hours</span></li>
-                    <li className="widget-uptime__stats-item"><strong className="widget-uptime__stats-item-title">50%</strong><span className="widget-uptime__stats-item-text">last 7 days</span></li>
-                    <li className="widget-uptime__stats-item"><strong className="widget-uptime__stats-item-title">75%</strong><span className="widget-uptime__stats-item-text">last 30 days</span></li>
+                    <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
+                    {
+                        load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
+                           {percent?.uptimePercentage24h}%
+                        </>)
+                      }
+                    </strong><span className="widget-uptime__stats-item-text">last 24 hours</span></li>
+                    <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
+                    {
+                        load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
+                           {percent?.uptimePercentage7d}%
+                        </>)
+                      }
+                    </strong><span className="widget-uptime__stats-item-text">last 7 days</span></li>
+                    <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
+                      {
+                        load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
+                           {percent?.uptimePercentage30d}%
+                        </>)
+                      }
+                    </strong><span className="widget-uptime__stats-item-text">last 30 days</span></li>
                   </ul>
                 </div>
               </div>
@@ -150,7 +333,7 @@ function Dashboard() {
                 </header>
                 <div className="widget__body">
                   <div className="widget-downtime__text">
-                    <p>It was recorded (for the monitor&nbsp;<a href="#">99designs</a>) on 2017-07-26 10:14:21 and the downtime lasted for 16 hrs, 57 mins.</p>
+                    <p>It was recorded (for the monitor&nbsp;{down?.name}) on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} and the downtime lasted for {durationInHours} hrs, {durationInMinutes} mins.</p>
                   </div>
                 </div>
               </div>
@@ -316,135 +499,50 @@ function Dashboard() {
 
 
                       <div className="events-table__body">
-
-
-
-                        <div className="events-table__row">
-                          <div className="events-table__col events-table__col--event">
-                            <div className="events-table__event events-table__event--paused">Paused</div>
-                          </div>
-                          <div className="events-table__col events-table__col--monitor">99designs</div>
-                          <div className="events-table__col events-table__col--time">2017-07-27 03:09:23</div>
-                          <div className="events-table__col events-table__col--reason">
-                            <div className="events-table__reason">Paused</div>
-                          </div>
-                          <div className="events-table__col events-table__col--duration">1 hrs, 16 mins</div>
-                          <button className="events-table__responsive-opener" type="button"></button>
+                        {/*Table data*/}
+                        
+                        {
+                            load2 ? 
+                            (<div>
+                                <Loading2/>
+                            </div>):(<>
+                                {
+                                 updown?.map((monitor, index) => (
+                                  <UptimeEvents status={"Up"} key={index} monitor={monitor} 
+                                  />
+                                 ))
+                                }
+                                </>)
+                          }
+                           
+                        
                         </div>
-                        <div className="events-table__row-responsive">
-                          <dl className="events-table__col-responsive events-table__col-responsive--time">
-                            <dt>Date-Time:</dt>
-                            <dd>2017-07-27 01:57:41</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--reason">
-                            <dt>Reason:</dt>
-                            <dd>Paused</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--duration">
-                            <dt>Duration:</dt>
-                            <dd>2 hrs, 28 mins</dd>
-                          </dl>
                         </div>
+                        
 
-
-
-                        <div className="events-table__row">
-                          <div className="events-table__col events-table__col--event">
-                            <div className="events-table__event events-table__event--up">Up</div>
-                          </div>
-                          <div className="events-table__col events-table__col--monitor">camelbak</div>
-                          <div className="events-table__col events-table__col--time">2017-07-27 03:09:23</div>
-                          <div className="events-table__col events-table__col--reason">
-                            <div className="events-table__reason">Paused</div>
-                          </div>
-                          <div className="events-table__col events-table__col--duration">1 hrs, 16 mins</div>
-                          <button className="events-table__responsive-opener" type="button"></button>
-                        </div>
-                        <div className="events-table__row-responsive">
-                          <dl className="events-table__col-responsive events-table__col-responsive--time">
-                            <dt>Date-Time:</dt>
-                            <dd>2017-07-27 01:57:41</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--reason">
-                            <dt>Reason:</dt>
-                            <dd>Paused</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--duration">
-                            <dt>Duration:</dt>
-                            <dd>2 hrs, 28 mins</dd>
-                          </dl>
-                        </div>
-
-
-
-                        <div className="events-table__row">
-                          <div className="events-table__col events-table__col--event">
-                            <div className="events-table__event events-table__event--down">Down</div>
-                          </div>
-                          <div className="events-table__col events-table__col--monitor">youtube</div>
-                          <div className="events-table__col events-table__col--time">2017-07-27 03:09:23</div>
-                          <div className="events-table__col events-table__col--reason">
-                            <div className="events-table__reason events-table__reason--success">OK (200)</div>
-                          </div>
-                          <div className="events-table__col events-table__col--duration">1 hrs, 16 mins</div>
-                          <button className="events-table__responsive-opener" type="button"></button>
-                        </div>
-                        <div className="events-table__row-responsive">
-                          <dl className="events-table__col-responsive events-table__col-responsive--time">
-                            <dt>Date-Time:</dt>
-                            <dd>2017-07-27 01:57:41</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--reason">
-                            <dt>Reason:</dt>
-                            <dd>Paused</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--duration">
-                            <dt>Duration:</dt>
-                            <dd>2 hrs, 28 mins</dd>
-                          </dl>
-                        </div>
-
-
-
-                        <div className="events-table__row">
-                          <div className="events-table__col events-table__col--event">
-                            <div className="events-table__event events-table__event--started">Started</div>
-                          </div>
-                          <div className="events-table__col events-table__col--monitor">smashinge magazine</div>
-                          <div className="events-table__col events-table__col--time">2017-07-27 03:09:23</div>
-                          <div className="events-table__col events-table__col--reason">
-                            <div className="events-table__reason events-table__reason--error">Connection Timeout</div>
-                          </div>
-                          <div className="events-table__col events-table__col--duration">1 hrs, 16 mins</div>
-                          <button className="events-table__responsive-opener" type="button"></button>
-                        </div>
-                        <div className="events-table__row-responsive">
-                          <dl className="events-table__col-responsive events-table__col-responsive--time">
-                            <dt>Date-Time:</dt>
-                            <dd>2017-07-27 01:57:41</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--reason">
-                            <dt>Reason:</dt>
-                            <dd>Paused</dd>
-                          </dl>
-                          <dl className="events-table__col-responsive events-table__col-responsive--duration">
-                            <dt>Duration:</dt>
-                            <dd>2 hrs, 28 mins</dd>
-                          </dl>
-                        </div>
- 
-                      </div>
-                    </div>
                     <div className="monitors-events__footer">
                       <div className="row justify-content-between align-items-center">
                         <div className="col-auto">
-                          <div className="monitors-events__pages-count">Page 2 of 10</div>
+                          <div className="monitors-events__pages-count">Page {page2} of {pages2}</div>
                         </div>
                         <div className="col-auto">
-                          <nav className="arrow-nav"><a className="arrow-nav__item arrow-nav__item--prev" href="#">Prev</a><a className="arrow-nav__item arrow-nav__item--next" href="#">Next</a></nav>
-                        </div>
+                          <nav className="arrow-nav">
+                            <button onClick={()=>{
+                              if(page2 > 1){
+                                setPage2(page2 - 1)
+                              }
+                            }} className="arrow-nav__item arrow-nav__item--prev" >Prev</button>
+                            <button onClick={()=>{
+                              if(page2 < pages2){
+                                setPage2(page2 + 1)
+                              }
+                            }} className="arrow-nav__item arrow-nav__item--next" >Next</button>
+                          </nav>
+                        </div>  
                       </div>
                     </div>
+
+                    
                   </div>
                 </div>
               </div>
