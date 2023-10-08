@@ -1,12 +1,16 @@
-import  { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Loading from '../Loading'
+import { Link } from 'react-router-dom';
 const apiUrl = import.meta.env.VITE_SERVER_URL;
 
-function EditMonitor({monitor,closeModal,toast,reload,setReload}) {
-  console.log(monitor)
+function EditMonitor({monitor,closeModal,toast,reload,setReload,contacts}) {
+  
+  console.log(monitor?.contacts)
   const [load, setLoad] = useState(false);
   const token = localStorage.getItem('token');
+  const [selectedContacts, setSelectedContacts] = useState([]);
+
     const [formData, setFormData] = useState({
         token: token,
         url: '' || monitor?.url,
@@ -17,6 +21,12 @@ function EditMonitor({monitor,closeModal,toast,reload,setReload}) {
         alertFrequency: 1 || monitor?.alertFrequency,
         contacts: [] 
       });
+
+      useEffect(() => {
+        // Initialize selectedContacts with the contacts initially selected for the monitor
+        setSelectedContacts(monitor?.contacts || []);
+      }, [monitor]);
+    
     
       const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -36,7 +46,10 @@ function EditMonitor({monitor,closeModal,toast,reload,setReload}) {
       const create = async (e) => {
         e.preventDefault();
         setLoad(true)
-        console.log(formData)
+         //add contacts to formData
+         formData.contacts = selectedContacts;
+         console.log(formData)
+         
          try {
           const response = await axios.put(`${apiUrl}/api/monitor/monitors/${monitor?._id}`, formData, {
             headers: {
@@ -64,7 +77,26 @@ function EditMonitor({monitor,closeModal,toast,reload,setReload}) {
     return formData.name.trim() !== '' && formData.url.trim() !== '';
   };
 
-    
+  const handleContactSelection = (contactValue) => {
+    // Check if the contact is already selected
+    const isSelected = selectedContacts.includes(contactValue);
+
+    if (isSelected) {
+      // If selected, remove it from the array
+      setSelectedContacts((prevSelectedContacts) =>
+        prevSelectedContacts.filter((contact) => contact !== contactValue)
+      );
+    } else {
+      // If not selected, add it to the array
+      setSelectedContacts((prevSelectedContacts) => [
+        ...prevSelectedContacts,
+        contactValue,
+      ]);
+    }
+  };
+
+
+  console.log(selectedContacts)
     
   return (
     <div>   {/*modal for new monitor*/}
@@ -199,97 +231,54 @@ function EditMonitor({monitor,closeModal,toast,reload,setReload}) {
               </fieldset>
               
             </div>
+
             <div className="new-monitor__col new-monitor__col--right">
               <fieldset className="new-monitor__section">
                 <div className="new-monitor__section-header">
                   <h3 className="new-monitor__section-title">Select Alert Contacts To Notify</h3>
                   <div className="new-monitor__notify">
-                    <p className="new-monitor__notify-text">2 of 7 alert contacts are selected.</p>
+                    <p className="new-monitor__notify-text">{selectedContacts?.length} of {contacts?.length} alert contacts are selected.</p>
                     <div className="new-monitor__notify-table">
                       <table className="table notify-contacts">
                         <thead>
                           <tr>
                             <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
+                                                        
                             </td>
                             <td className="notify-contacts__type">Type</td>
                             <td className="notify-contacts__contact">Alert Contact</td>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr>
-                            <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
-                            </td>
-                            <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
-                            <td className="notify-contacts__contact"><span>info@pixelframe.com</span></td>
-                          </tr>
-                          <tr>
-                            <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
-                            </td>
-                            <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
-                            <td className="notify-contacts__contact"><span>pixelframe@gmail.com</span></td>
-                          </tr>
-                          <tr>
-                            <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
-                            </td>
-                            <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
-                            <td className="notify-contacts__contact"><span>admin@youtube.com</span></td>
-                          </tr>
-                          <tr>
-                            <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
-                            </td>
-                            <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
-                            <td className="notify-contacts__contact"><span>user@facebook.com</span></td>
-                          </tr>
-                          <tr>
-                            <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
-                            </td>
-                            <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
-                            <td className="notify-contacts__contact"><span>info@smashingemagazine.com</span></td>
-                          </tr>
-                          <tr>
-                            <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
-                            </td>
-                            <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
-                            <td className="notify-contacts__contact"><span>staff@99designs.com</span></td>
-                          </tr>
-                          <tr>
-                            <td className="notify-contacts__check">
-                                                        <label className="control control--checkbox control--labeless">
-                                                          <input className="control__input control--labeless" type="checkbox" name="name12"/><span className="control__indicator"></span><span className="control__label">false</span>
-                                                        </label>
-                            </td>
-                            <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
-                            <td className="notify-contacts__contact"><span>staff@twitter.com</span></td>
-                          </tr>
+                          {
+                            contacts?.map((contact) => (
+                              <tr key={contact._id}>
+                              <td className="notify-contacts__check">
+                                                          <label className="control control--checkbox control--labeless">
+                                                            <input className="control__input control--labeless" type="checkbox" name="name12"
+                                                            onChange={() => handleContactSelection(contact?.value)}
+                                                            checked={selectedContacts.includes(
+                                                              contact?.value
+                                                            )}
+                                                            /><span className="control__indicator"></span><span className="control__label">false</span>
+                                                          </label>
+                              </td>
+                              <td className="notify-contacts__type"><span className="notify-contacts__mail"></span></td>
+                              <td className="notify-contacts__contact"><span>{contact?.value}</span></td>
+                            </tr>
+                            ))
+                            
+                          }
+                          
                         </tbody>
                       </table>
                     </div>
-                    <p className="new-monitor__notify-text">New alert contacts can be defined from the&nbsp;<a href="#">My Settings</a>&nbsp;page.</p>
+                    <p className="new-monitor__notify-text">New alert contacts can be defined from the&nbsp;<Link to="/settings">My Settings</Link>&nbsp;page.</p>
                   </div>
                 </div>
               </fieldset>
             </div>
+
           </div>
         </div>
         <footer className="modal__footer">

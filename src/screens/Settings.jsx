@@ -1,12 +1,173 @@
 import Header from "../components/Header"
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+import { Dialog, Transition,Switch } from '@headlessui/react'
+import { Fragment, useState,useEffect } from 'react'
+import CreateContacts from "../components/Settings/CreateContacts";
+import Loading2 from "../components/Loading2";
+import ChangePassword from "../components/Settings/ChangePassword";
+import DeleteAccount from "../components/Settings/DeleteAccount";
+import EditContacts from "../components/Settings/EditContacts";
+const apiUrl = import.meta.env.VITE_SERVER_URL;
 
 function Settings() {
+  let [isOpen, setIsOpen] = useState(false)
+  function closeModal() {setIsOpen(false)}
+  function openModal() {setIsOpen(true)}
+
+  let [isOpen2, setIsOpen2] = useState(false)
+  function closeModal2() {setIsOpen2(false)}
+  function openModal2() {setIsOpen2(true)}
+
+
+  let [reload, setReload] = useState(false)
+  let [load, setLoad] = useState(false)
+  let [contacts, setContacts] = useState([])
+
+  let [selectedContacts, setSelectedContacts] = useState({})
+
+  //fetch monitor data
+  useEffect(() => {
+    setLoad(true)
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    console.log(token)
+    // Make a POST request to the API
+    axios.post(`${apiUrl}/api/user/list-contacts`, {
+      token: token,
+      userId: userId,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        //console.log(response)
+        if (response.status === 200) {
+          // Data fetched successfully
+          setContacts(response?.data?.contacts); 
+          setLoad(false)
+        } else {
+          console.error('Failed to fetch contacts');
+          setLoad(false)
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching contact:', error);
+        setLoad(false)
+      });
+      
+  }, [reload]);
+
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    // Fetch user profile when the component mounts
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.post(
+          `${apiUrl}/api/user/profile`,
+          { token: token, userId: userId },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setUserProfile(response?.data?.user);
+          //console.log(response)
+        } else {
+          toast('User profile not found');
+        }
+      } catch (error) {
+        // Handle errors here
+        toast('Error fetching user profile');
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
+  // Function to handle delete button click
+  const handleDeleteClick = (contactId) => {
+    // Send a DELETE request to delete the contact
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+
+    axios
+      .delete(`${apiUrl}/api/user/delete-contact`, {
+        data: {
+          token: token,
+          userId: userId,
+          contactId: contactId,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          toast.success('Contact deleted successfully');
+          setReload(!reload); // Trigger a reload of contacts
+        } else {
+          toast.error('Failed to delete contact');
+        }
+      })
+      .catch((error) => {
+        console.error('Error deleting contact:', error);
+        toast.error('An error occurred while deleting contact');
+      });
+  };
+
+  // Function to handle delete button click
+  const handleEditClick = (contact) => {
+    setSelectedContacts(contact)
+    openModal2()
+  }
+
+  const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(userProfile?.isTwoFactorEnabled);
+
+  const handleToggle = async (value) => {
+    const userId = localStorage.getItem('userId');
+    try {
+      const response = await axios.post(
+        `${apiUrl}/api/user/toggle`,
+        {
+          userId: userId,
+          isTwoFactorEnabled: value == "true"? true : false, // Toggle the value
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        // Toggle successful
+        setIsTwoFactorEnabled(!isTwoFactorEnabled); // Update the state
+        toast('two-factor authentication toggled successfully');
+      }
+    } catch (error) {
+      // Handle errors here
+      console.error('Error toggling two-factor authentication:', error);
+      toast('Error toggling two-factor authentication');
+    }
+  };
+
+
   return (
     <div>
     <div className="layout layout--dashboard">
       <Header/>
-     
+      <ToastContainer autoClose={2000} />
+      
       <div className="layout__body">
         <div className="dashboard-topbar">
           <div className="wrapper wrapper--narrow">
@@ -28,104 +189,79 @@ function Settings() {
                       <h3 className="form__section-title">Personal</h3>
                     </div>
                     <div className="form-group">
-                      <label className="form-group__label">First-Last Name</label>
+                      <label className="form-group__label">Email</label>
                       <div className="form-group__field">
                                 <label className="field field--wide">
-                                  <input type="text" placeholder=" " name="input-name"/>
+                                  <input type="text" placeholder=" " name="input-name" value={userProfile?.email} readOnly/>
                                 </label>
                       </div>
                     </div>
+
                     <div className="form-group">
-                      <label className="form-group__label">Timezone</label>
+                      <label className="form-group__label">Total Allowed Monitors</label>
                       <div className="form-group__field">
-                                <div className="select">
-                                  <select name="select" placeholder="Please select">
-                                    <option value="-1"></option>
-                                    <option value="1">option 1</option>
-                                    <option value="2">option 2</option>
-                                    <option value="3">option 3</option>
-                                    <option value="4">option 4</option>
-                                    <option value="5">option 5</option>
-                                  </select>
-                                </div>
-                      </div>
-                    </div>
-                    <div className="form-group">
-                      <div className="control-group control-group--vertical">
-                                <label className="control control--checkbox undefined">
-                                  <input className="control__input" type="checkbox" name="name14"/><span className="control__indicator"></span><span className="control__label">Inform me about new features and updates (no more than twice a month). </span>
-                                </label>
-                                <label className="control control--checkbox undefined">
-                                  <input className="control__input" type="checkbox" name="name15"/><span className="control__indicator"></span><span className="control__label">Inform me about development/technical updates (API, IPs used..).</span>
+                      <label className="field field--wide">
+                                  <input type="text" placeholder=" " name="input-name" value={userProfile?.maxMonitors} readOnly/>
                                 </label>
                       </div>
                     </div>
-                    <div className="form__text">Note: important updates that can effect your usage of the service will still be delivered.</div>
-                  </div>
-                  <div className="form__section">
-                    <div className="form__section-header">
-                      <h3 className="form__section-title">Password</h3>
-                      <p className="form__section-description">Not required if you wont be updating the password</p>
-                    </div>
+
                     <div className="form-group">
-                      <label className="form-group__label">Current Password</label>
+                      <label className="form-group__label">Total Allowed Monitors</label>
                       <div className="form-group__field">
-                                <label className="field field--wide">
-                                  <input type="text" placeholder=" " name="input-name"/>
+                      <label className="field field--wide">
+                                  <input type="text" placeholder=" " name="input-name" value={userProfile?.maxContacts} readOnly/>
                                 </label>
                       </div>
                     </div>
+
                     <div className="form-group">
-                      <label className="form-group__label">New Password</label>
+                      <label className="form-group__label">Two Factor Authentication</label>
                       <div className="form-group__field">
-                                <label className="field field--wide">
-                                  <input type="text" placeholder=" " name="input-name"/>
+                      <label className="field field--wide">
+                      <div className="form-group__field">
+                      <select
+                      className="dropdown tw-text-sm tw-px-3 tw-w-full tw-h-10 tw-rounded-sm tw-border tw-border-gray-300"
+                        value={isTwoFactorEnabled}
+                        onChange={(e) => handleToggle(e.target.value)}
+                          >
+                           <option value="true">Enabled</option>
+                            <option value="false">Disabled</option>
+                            </select>
+                            </div>
                                 </label>
                       </div>
                     </div>
-                    <div className="form-group">
-                      <label className="form-group__label">Repeat New Password</label>
-                      <div className="form-group__field">
-                                <label className="field field--wide">
-                                  <input type="text" placeholder=" " name="input-name"/>
-                                </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="form__section">
-                    <div className="form__section-header">
-                      <h3 className="form__section-title">Email</h3>
-                      <p className="form__section-description">Your e-mail at now is 99designs@gmail.com</p>
-                    </div>
-                    <div className="form-group">
-                      <label className="form-group__label">New Email</label>
-                      <div className="form-group__field">
-                                <label className="field field--wide">
-                                  <input type="text" placeholder=" " name="input-name"/>
-                                </label>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="form__section">
-                    <div className="form__section-header">
-                      <h3 className="form__section-title">Delete Account</h3>
-                    </div>
-                    <div className="form__text">Uptime Engineer sends an account deletion verification email to the account e-mail. Once the verification link inside the e-mail is clicked, all account information at Uptime Engineer (including the account, monitors, logs and settings will be lost and can not be recovered).&nbsp;<span className="red">I still want to delete the account.</span></div>
-                    <div className="form__section-footer">
-                              <button className="button button--color-red"><span className="button__inner">Send account deletion e-mail</span></button>
-                    </div>
-                  </div>
-                  <div className="form__footer">
-                            <button className="button button--color-green"><span className="button__inner">Update</span></button>
+                    
+                    <br/>
+                    <br/>
+                    <br/>
                   </div>
                 </div>
               </div>
+
+              <div className="settings__section panel">
+              <div className="form__section">
+                    <div className="form__section-header">
+                      <h3 className="form__section-title">Update Password</h3>
+                    </div>
+                    <br/>
+                     <ChangePassword/>
+                  </div>
+                  </div>
+
+
             </div>
+
+
+            
+
+
             <div className="settings__col">
               <div className="settings__section panel">
                 <header className="settings__section-header">
                   <h2 className="settings__section-title">Alert Contacts</h2>
-                          <button className="button button--type-text button--type-text-small button--text-color-green"><span className="button__inner">ADD ALERTS CONTACTS</span></button>
+                          <button onClick={openModal} className="button button--type-text button--type-text-small button--text-color-green"><span className="button__inner">ADD ALERTS CONTACTS</span></button>
                 </header>
                 <div className="form">
                   <div className="form__section">
@@ -138,69 +274,57 @@ function Settings() {
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <td className="alert-contacts__type"><span className="alert-contacts__mail"></span></td>
-                          <td className="alert-contacts__contact">info@pixelframe.com</td>
-                          <td className="alert-contacts__action">
-                            <button className="alert-contacts__action-button alert-contacts__action-button--play" type="button" data-tooltip="Enable Alert Contact"></button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="alert-contacts__type"><span className="alert-contacts__mail"></span></td>
-                          <td className="alert-contacts__contact">pixelframe@gmail.com</td>
-                          <td className="alert-contacts__action">
-                            <button className="alert-contacts__action-button alert-contacts__action-button--pause" type="button" data-tooltip="Enable Alert Contact"></button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="alert-contacts__type"><span className="alert-contacts__mail"></span></td>
-                          <td className="alert-contacts__contact">admin@youtube.com</td>
-                          <td className="alert-contacts__action">
-                            <button className="alert-contacts__action-button alert-contacts__action-button--pause" type="button" data-tooltip="Enable Alert Contact"></button>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="alert-contacts__type"><span className="alert-contacts__mail"></span></td>
-                          <td className="alert-contacts__contact">user@facebook.com</td>
-                          <td className="alert-contacts__action">
-                            <button className="alert-contacts__action-button alert-contacts__action-button--delete" type="button" data-tooltip="Enable Alert Contact"></button>
-                          </td>
-                        </tr>
+                        {
+                          load ? (<><Loading2/></>):(<>
+                          
+                         
+                        {
+                          contacts.map((contact, index) => (
+                            <tr key={index}>
+                              <td className="alert-contacts__type"><span className="alert-contacts__mail"></span></td>
+                              <td className="alert-contacts__contact">{contact.value}</td>
+                              <td className="alert-contacts__action">
+                              <div className=" tw-mt-2 -mr-2 tw-flex tw-space-x-2">
+                             <button
+                               className="tw-text-gray-500 hover:tw-text-gray-700 focus:tw-outline-none"
+                               onClick={() => handleEditClick(contact)}
+                              >
+                               Edit
+                            </button>
+                            <button
+                              className="tw-text-red-500 hover:tw-text-red-700 focus:tw-outline-none"
+                              onClick={() => handleDeleteClick(contact._id)}
+                             >
+                             Delete
+                            </button>
+                           </div>
+                              </td>
+                            </tr>
+                          ))
+                        }
+                         </>)
+                        }
                       </tbody>
                     </table>
                   </div>
                 </div>
               </div>
+           
+
               <div className="settings__section panel">
-                <header className="settings__section-header">
-                  <h2 className="settings__section-title">API Settings</h2>
-                </header>
-                <div className="form">
-                  <div className="form__section">
+              <div className="form__section">
                     <div className="form__section-header">
-                      <h3 className="form__section-title">Main API Key</h3>
+                      <h3 className="form__section-title">Delete Account</h3>
                     </div>
-                    <div className="form__text">This is the API key that can control almost everything for your account (adding/editing/deleting monitors, alert contacts..).&nbsp;<span className="green">Create the main API key.</span></div>
-                    <div className="form__section-footer">
-                              <button className="button button--color-green"><span className="button__inner">Create the main API key</span></button>
-                    </div>
+                    <br/>
+                    <div className="form__text">Uptime Engineer sends an account deletion verification email to the account e-mail. Once the verification link inside the e-mail is clicked, all account information at Uptime Engineer (including the account, monitors, logs and settings will be lost and can not be recovered).&nbsp;<span className="red">I still want to delete the account.</span></div>
+                    <br/>
+                    <DeleteAccount/>
+                    
                   </div>
-                  <div className="form__section">
-                    <div className="form__section-header">
-                      <h3 className="form__section-title">Monitor-Specific API Keys</h3>
-                    </div>
-                    <div className="form__text">These are the API keys that can only use the read-only GetMonitors API method for a given monitor. They can be safely given to a customer and/or used in client-side code as the main API key wont be revealed.</div>
-                    <div className="form-group">
-                      <label className="form-group__label">Monitor</label>
-                      <div className="form-group__field">
-                                <label className="field field--wide">
-                                  <input type="text" placeholder=" " name="input-name"/>
-                                </label>
-                      </div>
-                    </div>
                   </div>
-                </div>
-              </div>
+
+ 
             </div>
           </div>
         </div>
@@ -214,6 +338,90 @@ function Settings() {
         </div>
       </div>
     </div>
+
+    {/*create monitor modal*/}
+    <Transition className="" appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="tw-relative tw-z-10 " onClose={closeModal}>
+          <Transition.Child
+            as={Fragment}
+            enter="tw-ease-out tw-duration-300"
+            enterFrom="tw-opacity-0"
+            enterTo="tw-opacity-100"
+            leave="tw-ease-in tw-duration-200"
+            leaveFrom="tw-opacity-100"
+            leaveTo="tw-opacity-0"
+          >
+            <div className="tw-fixed tw-inset-0 tw-bg-black tw-bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="tw-fixed tw-inset-0 tw-overflow-y-auto">
+            <div className="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="tw-ease-out tw-duration-300"
+                enterFrom="tw-opacity-0 tw-scale-95"
+                enterTo="tw-opacity-100 tw-scale-100"
+                leave="tw-ease-in tw-duration-200"
+                leaveFrom="tw-opacity-100 tw-scale-100"
+                leaveTo="tw-opacity-0 tw-scale-95"
+              >
+                <Dialog.Panel className="tw-w-full tw-max-w-xl tw-transform tw-overflow-hidden tw-rounded-2xl tw-bg-white tw-p-6 tw-text-left tw-align-middle tw-shadow-xl tw-transition-all">
+                  
+                  <div className="tw-mt-2">
+                   <CreateContacts close={closeModal} toast={toast} reload={reload} setReload={setReload}/>
+                  </div>
+
+                  
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+
+      {/*edit contacts modal*/}
+    <Transition className="" appear show={isOpen2} as={Fragment}>
+        <Dialog as="div" className="tw-relative tw-z-10 " onClose={closeModal2}>
+          <Transition.Child
+            as={Fragment}
+            enter="tw-ease-out tw-duration-300"
+            enterFrom="tw-opacity-0"
+            enterTo="tw-opacity-100"
+            leave="tw-ease-in tw-duration-200"
+            leaveFrom="tw-opacity-100"
+            leaveTo="tw-opacity-0"
+          >
+            <div className="tw-fixed tw-inset-0 tw-bg-black tw-bg-opacity-25" />
+          </Transition.Child>
+
+          <div className="tw-fixed tw-inset-0 tw-overflow-y-auto">
+            <div className="tw-flex tw-min-h-full tw-items-center tw-justify-center tw-p-4 tw-text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="tw-ease-out tw-duration-300"
+                enterFrom="tw-opacity-0 tw-scale-95"
+                enterTo="tw-opacity-100 tw-scale-100"
+                leave="tw-ease-in tw-duration-200"
+                leaveFrom="tw-opacity-100 tw-scale-100"
+                leaveTo="tw-opacity-0 tw-scale-95"
+              >
+                <Dialog.Panel className="tw-w-full tw-max-w-xl tw-transform tw-overflow-hidden tw-rounded-2xl tw-bg-white tw-p-6 tw-text-left tw-align-middle tw-shadow-xl tw-transition-all">
+                  
+                  <div className="tw-mt-2">
+                   <EditContacts selectedContact={selectedContacts} close={closeModal2} toast={toast} reload={reload} setReload={setReload}/>
+                  </div>
+
+                  
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
+
+
     <div className="mobile-menu">
       <nav className="mobile-menu__list"><a className="mobile-menu__item mobile-menu__item--icon mobile-menu__item--icon-dashboard" href="#">dashboard</a><a className="mobile-menu__item mobile-menu__item--icon mobile-menu__item--icon-settings" href="#">my settings</a></nav>
       <nav className="mobile-menu__list mobile-menu__list--bottom"><a className="mobile-menu__item mobile-menu__item--icon mobile-menu__item--icon-logout" href="#">logout</a></nav>

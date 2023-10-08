@@ -223,6 +223,43 @@ function Dashboard() {
     },
     cutout: '80%', 
   };
+
+const[contacts,setContacts] = useState([])
+const[load6,setLoad6] = useState(false)
+
+  //fetch monitor data
+  useEffect(() => {
+    setLoad6(true)
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    console.log(token)
+    // Make a POST request to the API
+    axios.post(`${apiUrl}/api/user/list-contacts`, {
+      token: token,
+      userId: userId,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+      .then((response) => {
+        //console.log(response)
+        if (response.status === 200) {
+          // Data fetched successfully
+          setContacts(response?.data?.contacts); 
+          setLoad6(false)
+        } else {
+          console.error('Failed to fetch contacts');
+          setLoad6(false)
+        }
+      })
+      .catch((error) => {
+        console.error('Error fetching contact:', error);
+        setLoad6(false)
+      });
+      
+  }, []);
+  
   
 
   return (
@@ -580,7 +617,7 @@ function Dashboard() {
                 <Dialog.Panel className="tw-w-full tw-max-w-4xl tw-transform tw-overflow-hidden tw-rounded-2xl tw-bg-white tw-p-6 tw-text-left tw-align-middle tw-shadow-xl tw-transition-all">
                   
                   <div className="tw-mt-2">
-                   <EditMonitor monitor={pickedMonitor} closeModal={closeModal4} toast={toast} reload={reload} setReload={setReload}/>
+                   <EditMonitor monitor={pickedMonitor} closeModal={closeModal4} toast={toast} reload={reload} setReload={setReload} contacts={contacts}/>
                   </div>
 
                   
@@ -705,7 +742,7 @@ function Dashboard() {
                 <Dialog.Panel className="tw-w-full tw-max-w-4xl tw-transform tw-overflow-hidden tw-rounded-2xl tw-bg-white tw-p-6 tw-text-left tw-align-middle tw-shadow-xl tw-transition-all">
                   
                   <div className="tw-mt-2">
-                   <CreateMonitor closeModal={closeModal} toast={toast} reload={reload} setReload={setReload}/>
+                   <CreateMonitor closeModal={closeModal} toast={toast} reload={reload} setReload={setReload} contacts={contacts}/>
                   </div>
 
                   

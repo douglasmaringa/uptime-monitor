@@ -18,7 +18,25 @@ const toggleDropdown = () => {
 // Calculate duration based on createdAt and updatedAt
 const createdAt = moment(monitor?.createdAt);
 const updatedAt = moment(monitor?.updatedAt);
+
 const duration = moment.duration(updatedAt.diff(createdAt));
+
+const { hours, minutes } = getTimeDifference(monitor?.createdAt, monitor?.updatedAt);
+
+function getTimeDifference(createdAt, updatedAt) {
+  const createdAtDate = new Date(createdAt);
+  const updatedAtDate = new Date(updatedAt);
+
+  const timeDifference = updatedAtDate - createdAtDate;
+
+  const hours = Math.floor(timeDifference / (1000 * 60 * 60));
+  const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+
+  return { hours, minutes };
+}
+
+
+
 
 const pause = async (id) => {
     const token = localStorage.getItem('token');
@@ -103,7 +121,7 @@ const edit = async () => {
                                     <span className="status-bar__tooltip">
                                     Start Time: {createdAt.format('YYYY-MM-DD HH:mm:ss')}<br />
                                     End Time: {updatedAt.format('YYYY-MM-DD HH:mm:ss')}<br />
-                                    Duration: {duration.hours()} hrs, {duration.minutes()} mins<br />
+                                    Duration: {hours} hrs, {minutes} mins<br />
                                     Status: {monitor?.isPaused ? 'Paused' : 'Active'}
                                     </span>
                                     </div>
