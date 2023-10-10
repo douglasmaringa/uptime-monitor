@@ -377,8 +377,8 @@ const[load6,setLoad6] = useState(false)
             </div>
 
 
-
-            <div className="widgets__item">
+           
+            {/*<div className="widgets__item">
               <div className="widget-storage widget">
                 <header className="widget__header">
                   <h2 className="widget__title">Storage</h2>
@@ -393,11 +393,11 @@ const[load6,setLoad6] = useState(false)
                   </ul>
                 </div>
               </div>
-            </div>
+            </div>*/}
 
 
 
-            <div className="widgets__item">
+            {/*<div className="widgets__item">
               <div className="widget-processor widget">
                 <header className="widget__header">
                   <h2 className="widget__title">Processor</h2>
@@ -409,10 +409,10 @@ const[load6,setLoad6] = useState(false)
                   </div>
                 </div>
               </div>
-            </div>
+                    </div>*/}
 
 
-
+            {/*
             <div className="widgets__item">
               <div className="widget-ram widget">
                 <header className="widget__header">
@@ -425,8 +425,8 @@ const[load6,setLoad6] = useState(false)
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </div>*/}
+                  </div>
 
 
         

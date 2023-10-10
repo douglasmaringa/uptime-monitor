@@ -1749,11 +1749,9 @@ html {
 .logo {
   width: 235px;
   height: 41px;
-  display: inline-block;
-  vertical-align: middle;
-  background-image: url(../images/sprite.png);
-  background-position: 0px 0px;
-  background-size: 235px 111px;
+  background-repeat: no-repeat;
+  background-image: url(../images/logo.png);
+  
 }
 
 @media (-webkit-min-device-pixel-ratio: 2), (min--moz-device-pixel-ratio: 2), (min-device-pixel-ratio: 2), (min-resolution: 192dpi), (min-resolution: 2dppx) {

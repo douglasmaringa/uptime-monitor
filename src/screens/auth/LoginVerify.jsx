@@ -76,7 +76,7 @@ function LoginVerify() {
     <ToastContainer autoClose={2000} />
     <div className='tw-bg-gray-100 tw-min-h-screen tw-flex tw-justify-center tw-items-center'>
       <div className='tw-w-full tw-max-w-lg tw-p-6 tw-space-y-6 tw-bg-white tw-rounded-lg tw-shadow-md'>
-        <h2 className='tw-text-2xl tw-text-center tw-font-semibold tw-text-gray-800'>Verify Registration Code</h2>
+        <h2 className='tw-text-2xl tw-text-center tw-font-semibold tw-text-gray-800'>Verify 2fa Code</h2>
         <form onSubmit={handleSubmit}>
         
           <div className='tw-mb-4'>

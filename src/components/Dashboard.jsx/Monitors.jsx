@@ -123,6 +123,10 @@ const edit = async () => {
                                     End Time: {updatedAt.format('YYYY-MM-DD HH:mm:ss')}<br />
                                     Duration: {hours} hrs, {minutes} mins<br />
                                     Status: {monitor?.isPaused ? 'Paused' : 'Active'}
+                                    <br/>
+                                    Uptime : {monitor?.stats}%
+                                    <br/>
+                                   Downtime : {100 - parseInt(monitor?.stats)}%
                                     </span>
                                     </div>
                                   </div>

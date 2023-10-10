@@ -207,7 +207,7 @@ function Settings() {
                     </div>
 
                     <div className="form-group">
-                      <label className="form-group__label">Total Allowed Monitors</label>
+                      <label className="form-group__label">Total Allowed Contacts</label>
                       <div className="form-group__field">
                       <label className="field field--wide">
                                   <input type="text" placeholder=" " name="input-name" value={userProfile?.maxContacts} readOnly/>
