@@ -22,6 +22,7 @@ function Settings() {
 
 
   let [reload, setReload] = useState(false)
+  let [reload2, setReload2] = useState(false)
   let [load, setLoad] = useState(false)
   let [contacts, setContacts] = useState([])
 
@@ -60,6 +61,10 @@ function Settings() {
       
   }, [reload]);
 
+  useEffect(() => {
+    document.title = 'My Settings – Alerts.net';
+  }, [])
+
   const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
@@ -92,7 +97,7 @@ function Settings() {
     };
 
     fetchUserProfile();
-  }, []);
+  }, [reload2]);
 
   // Function to handle delete button click
   const handleDeleteClick = (contactId) => {
@@ -131,6 +136,7 @@ function Settings() {
     openModal2()
   }
 
+  console.log(userProfile?.isTwoFactorEnabled)
   const [isTwoFactorEnabled, setIsTwoFactorEnabled] = useState(userProfile?.isTwoFactorEnabled);
 
   const handleToggle = async (value) => {
@@ -153,6 +159,7 @@ function Settings() {
         // Toggle successful
         setIsTwoFactorEnabled(!isTwoFactorEnabled); // Update the state
         toast('two-factor authentication toggled successfully');
+        setReload2(!reload2); // Trigger a reload of contacts
       }
     } catch (error) {
       // Handle errors here
@@ -222,7 +229,7 @@ function Settings() {
                       <div className="form-group__field">
                       <select
                       className="dropdown tw-text-sm tw-px-3 tw-w-full tw-h-10 tw-rounded-sm tw-border tw-border-gray-300"
-                        value={isTwoFactorEnabled}
+                        value={userProfile?.isTwoFactorEnabled}
                         onChange={(e) => handleToggle(e.target.value)}
                           >
                            <option value="true">Enabled</option>

@@ -200,7 +200,7 @@ function EditMonitor({monitor,closeModal,toast,reload,setReload,contacts}) {
 
 
                   <div className="form-group">
-                    <label className="form-group__label">Monitoring Frequecy</label>
+                    <label className="form-group__label">Monitoring Frequency</label>
                     <div className="form-group__field">
                               <div className="select">
                                 <select
@@ -223,7 +223,7 @@ function EditMonitor({monitor,closeModal,toast,reload,setReload,contacts}) {
 
 
                   <div className="form-group">
-                    <label className="form-group__label">Alert Frequecy</label>
+                    <label className="form-group__label">Alert Frequency</label>
                     <div className="form-group__field">
                               <div className="select">
                                 <select

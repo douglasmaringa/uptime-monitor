@@ -51,7 +51,7 @@ function SortActions({sortByName,setSortByName,statusSort, setStatusSort,typeSor
                 </fieldset>
                 <fieldset className="form__section">
                   <div className="form-group">
-                    <label className="form-group__label">Sort by Status:</label>
+                    <label className="form-group__label">Filter Monitor Status:</label>
                     <div className="form-group__field">
                       <div className="control-group control-group--vertical">
                         <label className="control control--radio undefined">
@@ -85,7 +85,7 @@ function SortActions({sortByName,setSortByName,statusSort, setStatusSort,typeSor
                 </fieldset>
                 <fieldset className="form__section">
                   <div className="form-group">
-                    <label className="form-group__label">Sort by Type:</label>
+                    <label className="form-group__label">Filter Monitor Type:</label>
                     <div className="form-group__field">
                       <div className="control-group control-group--vertical">
                         <label className="control control--radio undefined">

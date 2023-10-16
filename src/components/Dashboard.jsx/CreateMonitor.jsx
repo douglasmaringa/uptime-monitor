@@ -163,17 +163,56 @@ function CreateMonitor({closeModal,toast,reload,setReload,contacts}) {
                        )
                      }
                     
+                    {
+                      formData.type === 'web' && (
+                  
                     <div className="form-group__field">
                             <label className="field field--wide">
                             <input
-                            type="text"
-                            placeholder=" "
-                            name="url"
-                            value={formData.url}
-                            onChange={handleInputChange}
-                          />
+                              type="text"
+                              placeholder="https://www."
+                              name="url"
+                              value={formData.url}
+                              onChange={(e) => {
+                                const enteredValue = e.target.value;
+                                // Check if the entered value does not start with "https://www." already
+                                if (!enteredValue.startsWith("https://www.")) {
+                                  // If not, add the prefix to it
+                                  const newValue = "https://www." + enteredValue;
+                                  // Now update the formData with the new value
+                                  setFormData({ ...formData, url: newValue });
+                                } else {
+                                  // If it already starts with "https://www.", just update the formData
+                                  setFormData({ ...formData, url: enteredValue });
+                                }
+                              }}
+                            />
                               </label>
                     </div>
+                    )}
+
+                    {
+                      formData.type != 'web' && (
+                  
+                    <div className="form-group__field">
+                            <label className="field field--wide">
+                            <input
+                              type="text"
+                              placeholder=""
+                              name="url"
+                              value={formData.url}
+                              onChange={(e) => {          
+                                  setFormData({ ...formData, url: e.target.value });
+                                
+                              }}
+                            />
+                              </label>
+                    </div>
+                    )}
+
+
+
+
                   </div>
                   
                   {
@@ -195,7 +234,7 @@ function CreateMonitor({closeModal,toast,reload,setReload,contacts}) {
                        )}
 
                   <div className="form-group">
-                    <label className="form-group__label">Monitoring Frequecy</label>
+                    <label className="form-group__label">Monitoring Frequency</label>
                     <div className="form-group__field">
                               <div className="select">
                                 <select
@@ -218,7 +257,7 @@ function CreateMonitor({closeModal,toast,reload,setReload,contacts}) {
 
 
                   <div className="form-group">
-                    <label className="form-group__label">Alert Frequecy</label>
+                    <label className="form-group__label">Alert Frequency</label>
                     <div className="form-group__field">
                               <div className="select">
                                 <select

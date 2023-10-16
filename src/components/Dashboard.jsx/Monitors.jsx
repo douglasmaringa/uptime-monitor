@@ -107,9 +107,33 @@ const edit = async () => {
                               <div className="monitor__data"><span className="monitor__protocol">https</span><Link className="monitor__title" to="/monitor">{monitor?.name}</Link></div>
                               <div className="monitor__additional">
                                 <div className="status-summary">
-                                  <div className="status-summary__label">{monitor?.stats}%</div>
+                          
+                                  <div className="status-summary__label">
+                                  {
+                                    monitor?.isPaused === true ? (<>
+                                        Paused
+                                    </>):(<>
+                                      {
+                                      hours == 0 && minutes == 0 ? (<>
+                                          Started
+                                        </>):(<>
+                                          {monitor?.stats}%
+                                    </>)}
+                                    </>)
+                                    }
+                                    </div>
                                   <div className="status-summary__bar">
                                     <div className="status-bar">
+                                    {
+                                    monitor?.isPaused === true ? (<>
+                                    <span className="status-bar__item status-bar__item--success tw-bg-gray-400" style={{width:'100%'}}>
+                                        </span>
+                                    </>):(<>
+                                      {
+                                        hours == 0 && minutes == 0 ? (<>
+                                          <span className="status-bar__item status-bar__item--success tw-bg-gray-400" style={{width:'100%'}}>
+                                        </span>
+                                        </>):(<>
                                         {monitor?.stats == "0" ? (<>
                                             <span className="status-bar__item status-bar__item--success tw-bg-red-600" style={{width:'100%'}}>
                                         </span>
@@ -117,7 +141,9 @@ const edit = async () => {
                                             <span className="status-bar__item status-bar__item--success tw-bg-green-500" style={{width: `100%`}}>
                                         </span>
                                         </>)}
-                                        
+                                        </>)
+                                      }
+                                      </>)}
                                     <span className="status-bar__tooltip">
                                     Start Time: {createdAt.format('YYYY-MM-DD HH:mm:ss')}<br />
                                     End Time: {updatedAt.format('YYYY-MM-DD HH:mm:ss')}<br />

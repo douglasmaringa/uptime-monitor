@@ -66,7 +66,7 @@ function BulkActions({ monitors,reload,setReload,toast,close }) {
       <div className="" id="bulk-actions">
         <header className="modal__header">
           <h2 className="modal__title">Bulk Actions</h2>
-          <button className="modal__close" type="button" data-close="modal">
+          <button onClick={close} className="modal__close" type="button" data-close="modal">
             X
           </button>
         </header>

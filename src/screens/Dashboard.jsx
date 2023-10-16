@@ -57,6 +57,11 @@ function Dashboard() {
     if (token) {console.log(token)} else {navigate('/login');}
   }, [navigate]);
 
+  useEffect(() => {
+    document.title = 'Dashboard – Alerts.net';
+  }, [])
+  
+
   //fetch monitor data
   useEffect(() => {
     setLoad(true)
@@ -80,7 +85,11 @@ function Dashboard() {
           //console.log(response)
           setMonitors(response.data); // Assuming the response data contains the list of monitors
           //console.log(response.data)
+          
+          if(response?.data?.monitors?.length > 0){
+           
           setPages(response?.data?.totalPages)
+          }
           setLoad(false)
         } else {
           console.error('Failed to fetch monitors');
@@ -114,7 +123,9 @@ function Dashboard() {
           //console.log(response)
           setUpdown(response?.data?.events); // Assuming the response data contains the list of monitors
           //console.log(response.data.events)
+          if(response?.data?.monitors?.length > 0){
           setPages2(response?.data?.totalPages)
+          }
           setLoad2(false)
         } else {
           console.error('Failed to fetch monitors');
@@ -149,7 +160,7 @@ function Dashboard() {
         setLoad3(false)
       });
       
-  }, []);
+  }, [reload]);
 
   //get % data 
   useEffect(() => {
@@ -173,7 +184,7 @@ function Dashboard() {
         setLoad4(false)
       });
       
-  }, []);
+  }, [reload]);
 
   //get latest downtime data 
   useEffect(() => {
@@ -197,7 +208,45 @@ function Dashboard() {
         setLoad5(false)
       });
       
+  }, [reload]);
+
+  const [userProfile, setUserProfile] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const userId = localStorage.getItem('userId');
+    // Fetch user profile when the component mounts
+    const fetchUserProfile = async () => {
+      try {
+        const response = await axios.post(
+          `${apiUrl}/api/user/profile`,
+          { token: token, userId: userId },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setUserProfile(response?.data?.user);
+          //console.log(response)
+        } else {
+          toast('User profile not found');
+        }
+      } catch (error) {
+        // Handle errors here
+        toast('Error fetching user profile');
+        console.error('Error fetching user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
   }, []);
+
+
+
+
 
 
   // Calculate the duration in hours and minutes
@@ -213,6 +262,17 @@ function Dashboard() {
       {
         data: [stats?.upMonitors, stats?.downMonitors, stats?.pausedMonitors],
         backgroundColor: ['#388E3C', '#D32F2F', '#FFA001'], // Colors for each segment
+      },
+    ],
+  };
+
+  // Create data for the pie chart
+  const pieChartData2 = {
+    labels: [''],
+    datasets: [
+      {
+        data: ["100"],
+        backgroundColor: ['#388E3C'], // Colors for each segment
       },
     ],
   };
@@ -261,7 +321,18 @@ const[load6,setLoad6] = useState(false)
       });
       
   }, []);
-  console.log(down?.obj?.monitor?.type)
+
+  function hasValues(obj) {
+    for (let key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        if (obj[key] !== 0 && obj[key] !== '' && obj[key] !== null && obj[key] !== undefined) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   
 
   return (
@@ -276,7 +347,7 @@ const[load6,setLoad6] = useState(false)
           <div className="wrapper">
             <div className="dashboard-topbar__headline">
               <h1 className="dashboard-topbar__title">Quick Stats</h1>
-              <p className="dashboard-topbar__description">You are currently using {parseInt(stats?.upMonitors) + parseInt(stats?.downMonitors)} of your {parseInt(stats?.upMonitors) + parseInt(stats?.downMonitors) + parseInt(stats?.pausedMonitors)} monitors.</p>
+              <p className="dashboard-topbar__description">You are currently using {parseInt(stats?.upMonitors) + parseInt(stats?.downMonitors)} of your {userProfile?.maxMonitors} monitors.</p>
             </div>
             <div className="dashboard-topbar__actions">
                       <button onClick={openModal} className="button button--color-green button--size-md button--icon-plus"><span className="button__inner">add new monitor</span></button>
@@ -296,7 +367,14 @@ const[load6,setLoad6] = useState(false)
                 </header>
                 <div className="widget-monitoring__body widget__body">
                   <div className="tw-m-auto">
-                  <Doughnut data={pieChartData} options={chartOptions} width={82} height={82} />
+                    {
+                      hasValues(stats) ? (<>
+                      <Doughnut data={pieChartData} options={chartOptions} width={82} height={82} />
+                      </>):(<>
+                        <Doughnut data={pieChartData2} options={chartOptions} width={82} height={82} />
+                      </>)
+                    }
+                  
                   </div>
                   <ul className="widget-monitoring__stats">
                     <li className="widget-monitoring__stats-item widget-monitoring__stats-item--up"><strong className="widget-monitoring__stats-item-title">
@@ -380,7 +458,7 @@ const[load6,setLoad6] = useState(false)
                 }
 
                 {
-                  down?.obj?.monitor?.type === 'ping' && down?.obj?.availability == "Unreachable"  && (
+                  down?.obj?.monitor?.type === 'ping' && down?.obj?.ping == "Unreachable"  && (
                   <div className="widget-downtime__text">
                     <p>The last downtime recorded was on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} UTC (for the monitor&nbsp;{down?.name}) and lasted {durationInHours} hrs, {durationInMinutes} mins </p>
                   </div>
@@ -389,7 +467,7 @@ const[load6,setLoad6] = useState(false)
 
 
                 {
-                  down?.obj?.monitor?.type === 'port' && down?.obj?.availability == "Closed"  && (
+                  down?.obj?.monitor?.type === 'port' && down?.obj?.port == "Closed"  && (
                   <div className="widget-downtime__text">
                     <p>The last downtime recorded was on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} UTC (for the monitor&nbsp;{down?.name}) and lasted {durationInHours} hrs, {durationInMinutes} mins </p>
                   </div>
@@ -397,7 +475,7 @@ const[load6,setLoad6] = useState(false)
                 }
 
 
-{
+                 {
                   down?.obj?.monitor?.type === 'web' && down?.obj?.availability == "Up"  && (
                   <div className="widget-downtime__text">
                     <p>No downtime Found </p>
@@ -406,7 +484,7 @@ const[load6,setLoad6] = useState(false)
                 }
 
                 {
-                  down?.obj?.monitor?.type === 'ping' && down?.obj?.availability == "Reachable"  && (
+                  down?.obj?.monitor?.type === 'ping' && down?.obj?.ping == "Reachable"  && (
                   <div className="widget-downtime__text">
                     <p>No downtime Found </p>
                   </div>
@@ -415,7 +493,7 @@ const[load6,setLoad6] = useState(false)
 
 
                 {
-                  down?.obj?.monitor?.type === 'port' && down?.obj?.availability == "Open"  && (
+                  down?.obj?.monitor?.type === 'port' && down?.obj?.port == "Open"  && (
                   <div className="widget-downtime__text">
                     <p>No downtime Found </p>
                   </div>
@@ -540,7 +618,7 @@ const[load6,setLoad6] = useState(false)
                   <div className="tw-mt-auto monitors-events__footer">
                       <div className="row justify-content-between align-items-center">
                         <div className="col-auto">
-                          <div className="monitors-events__pages-count">Page {page} of {pages}</div>
+                          <div className="monitors-events__pages-count">Page {page} of {pages === 0 ? "1": pages}</div>
                         </div>
                         <div className="col-auto">
                           <nav className="arrow-nav">
@@ -610,7 +688,7 @@ const[load6,setLoad6] = useState(false)
                     <div className="monitors-events__footer">
                       <div className="row justify-content-between align-items-center">
                         <div className="col-auto">
-                          <div className="monitors-events__pages-count">Page {page2} of {pages2}</div>
+                          <div className="monitors-events__pages-count">Page {page2} of {pages2 === 0 ? "1": pages2 }</div>
                         </div>
                         <div className="col-auto">
                           <nav className="arrow-nav">
