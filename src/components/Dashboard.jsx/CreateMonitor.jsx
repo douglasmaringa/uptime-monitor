@@ -26,7 +26,7 @@ function CreateMonitor({closeModal,toast,reload,setReload,contacts}) {
       
         // Check if the field is frequency or alertFrequency and parse it accordingly
         const parsedValue =
-          name === "frequency" || name === "alertFrequency"
+          name === "frequency" || name === "alertFrequency" || name === "port"
             ? parseInt(value, 10)
             : value;
       
@@ -122,9 +122,9 @@ function CreateMonitor({closeModal,toast,reload,setReload,contacts}) {
                                  value={formData.type}
                                  onChange={handleInputChange}>
                                 
-                                  <option value="web">Web Based</option>
-                                  <option value="port">Port Based</option>
-                                  <option value="ping">Ping Based</option>
+                                  <option value="web">Web/Http</option>
+                                  <option value="port">Port</option>
+                                  <option value="ping">Ping</option>
                           
                                 </select>
                               </div>
@@ -175,6 +175,24 @@ function CreateMonitor({closeModal,toast,reload,setReload,contacts}) {
                               </label>
                     </div>
                   </div>
+                  
+                  {
+                       formData.type === 'port' && (
+                  <div className="form-group">
+                    <label className="form-group__label">Port</label>
+                    <div className="form-group__field">
+                              <label className="field field--wide">
+                                <input 
+                                type="number"
+                                placeholder=" "
+                                name="port"
+                                value={formData.port}
+                                onChange={handleInputChange}
+                                />
+                              </label>
+                    </div>
+                  </div>
+                       )}
 
                   <div className="form-group">
                     <label className="form-group__label">Monitoring Frequecy</label>

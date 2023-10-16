@@ -14,12 +14,12 @@ function UptimeEvents({ status, monitor }) {
       <div className="events-table__row">
         {monitor?.isPaused === false ? (
           <>
-            {monitor?.status === 'Up' && (
+            {monitor?.status === 'Uptime' && (
               <div className="events-table__col events-table__col--event">
                 <div className="events-table__event events-table__event--up">Up</div>
               </div>
             )}
-            {monitor?.status === 'Down' && (
+            {monitor?.status === 'Downtime' && (
               <div className="events-table__col events-table__col--event">
                 <div className="events-table__event events-table__event--down">Down</div>
               </div>
@@ -39,12 +39,12 @@ function UptimeEvents({ status, monitor }) {
         <div className="events-table__col events-table__col--time">{createdAt}</div>
         <div className="events-table__col events-table__col--reason">
           {
-            monitor?.status === 'Up' && (
+            monitor?.status === 'Uptime' && (
               <div className="events-table__reason tw-text-green-500">OK (200)</div>
             )
           }
           {
-            monitor?.status === 'Down' && (
+            monitor?.status === 'Downtime' && (
               <div className="events-table__reason tw-text-red-500">Error (500)</div>
             )
           }

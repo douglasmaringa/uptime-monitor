@@ -79,6 +79,7 @@ function Dashboard() {
           // Data fetched successfully
           //console.log(response)
           setMonitors(response.data); // Assuming the response data contains the list of monitors
+          //console.log(response.data)
           setPages(response?.data?.totalPages)
           setLoad(false)
         } else {
@@ -112,6 +113,7 @@ function Dashboard() {
           // Data fetched successfully
           //console.log(response)
           setUpdown(response?.data?.events); // Assuming the response data contains the list of monitors
+          //console.log(response.data.events)
           setPages2(response?.data?.totalPages)
           setLoad2(false)
         } else {
@@ -187,7 +189,7 @@ function Dashboard() {
     })
       .then((response) => {
         setDown(response.data); 
-        
+           //console.log(response.data)
           setLoad5(false)
       })
       .catch((error) => {
@@ -259,7 +261,7 @@ const[load6,setLoad6] = useState(false)
       });
       
   }, []);
-  
+  console.log(down?.obj?.monitor?.type)
   
 
   return (
@@ -290,7 +292,7 @@ const[load6,setLoad6] = useState(false)
             <div className="widgets__item">
               <div className="widget-monitoring widget">
                 <header className="widget__header">
-                  <h2 className="widget__title">Monitoring Stats</h2><span className="widget__description">Stats of your {17} monitors</span>
+                  <h2 className="widget__title">Monitoring Stats</h2><span className="widget__description">Stats of your {parseInt(stats?.upMonitors) + parseInt(stats?.downMonitors) + parseInt(stats?.pausedMonitors)} monitors</span>
                 </header>
                 <div className="widget-monitoring__body widget__body">
                   <div className="tw-m-auto">
@@ -369,9 +371,57 @@ const[load6,setLoad6] = useState(false)
                   <h2 className="widget__title">Latest Downtime</h2>
                 </header>
                 <div className="widget__body">
+                {
+                  down?.obj?.monitor?.type === 'web' && down?.obj?.availability == "Down"  && (
                   <div className="widget-downtime__text">
-                    <p>It was recorded (for the monitor&nbsp;{down?.name}) on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} and the downtime lasted for {durationInHours} hrs, {durationInMinutes} mins.</p>
+                    <p>The last downtime recorded was on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} UTC (for the monitor&nbsp;{down?.name}) and lasted {durationInHours} hrs, {durationInMinutes} mins </p>
                   </div>
+                  )
+                }
+
+                {
+                  down?.obj?.monitor?.type === 'ping' && down?.obj?.availability == "Unreachable"  && (
+                  <div className="widget-downtime__text">
+                    <p>The last downtime recorded was on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} UTC (for the monitor&nbsp;{down?.name}) and lasted {durationInHours} hrs, {durationInMinutes} mins </p>
+                  </div>
+                  )
+                }
+
+
+                {
+                  down?.obj?.monitor?.type === 'port' && down?.obj?.availability == "Closed"  && (
+                  <div className="widget-downtime__text">
+                    <p>The last downtime recorded was on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} UTC (for the monitor&nbsp;{down?.name}) and lasted {durationInHours} hrs, {durationInMinutes} mins </p>
+                  </div>
+                  )
+                }
+
+
+{
+                  down?.obj?.monitor?.type === 'web' && down?.obj?.availability == "Up"  && (
+                  <div className="widget-downtime__text">
+                    <p>No downtime Found </p>
+                  </div>
+                  )
+                }
+
+                {
+                  down?.obj?.monitor?.type === 'ping' && down?.obj?.availability == "Reachable"  && (
+                  <div className="widget-downtime__text">
+                    <p>No downtime Found </p>
+                  </div>
+                  )
+                }
+
+
+                {
+                  down?.obj?.monitor?.type === 'port' && down?.obj?.availability == "Open"  && (
+                  <div className="widget-downtime__text">
+                    <p>No downtime Found </p>
+                  </div>
+                  )
+                }
+    
                 </div>
               </div>
             </div>
