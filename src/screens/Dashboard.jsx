@@ -334,7 +334,7 @@ const[load6,setLoad6] = useState(false)
     return false;
   }
 
-  
+
 
   return (
     <div>
@@ -495,6 +495,14 @@ const[load6,setLoad6] = useState(false)
 
                 {
                   down?.obj?.monitor?.type === 'port' && down?.obj?.port == "Open"  && (
+                  <div className="widget-downtime__text">
+                    <p>No downtime Found </p>
+                  </div>
+                  )
+                }
+
+                {
+                  down?.length == 0  && (
                   <div className="widget-downtime__text">
                     <p>No downtime Found </p>
                   </div>
