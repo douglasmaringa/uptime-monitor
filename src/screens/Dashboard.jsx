@@ -655,7 +655,7 @@ const[load6,setLoad6] = useState(false)
                   <header className="monitors-events__header">
                     <h2 className="monitors-events__title">Latest Events For All Monitors</h2>
                     <div className="monitors-events__actions">
-                      <div className="monitors-events__actions-item"><a className="export-button" href="#">Export Logs</a></div>
+                      <div className="monitors-events__actions-item"><a className="export-button" href="#"></a></div>
                     </div>
                   </header>
 
