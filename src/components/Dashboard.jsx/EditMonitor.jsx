@@ -13,12 +13,12 @@ function EditMonitor({monitor,closeModal,toast,reload,setReload,contacts}) {
 
     const [formData, setFormData] = useState({
         token: token,
-        url: '' || monitor?.url,
-        name:'' || monitor?.name,
-        port: 0 || monitor?.port,
-        frequency: 1 || monitor?.frequency,
+        url:  monitor?.url,
+        name: monitor?.name,
+        port:  monitor?.port,
+        frequency: monitor?.frequency,
         type:  monitor?.type,
-        alertFrequency: 1 || monitor?.alertFrequency,
+        alertFrequency: monitor?.alertFrequency,
         contacts: [] 
       });
 

@@ -2,10 +2,15 @@ import React from 'react';
 import moment from 'moment';
 
 function UptimeEvents({ status, monitor }) {
-  // Calculate the createdAt and duration based on monitor.timestamp
-  const createdAt = moment(monitor.timestamp).format('YYYY-MM-DD HH:mm:ss');
+  const createdAt = moment(monitor?.timestamp).format('YYYY-MM-DD HH:mm:ss');
   const currentTime = moment();
-  const duration = moment.duration(currentTime.diff(moment(monitor.timestamp)));
+  const endTime = monitor?.endTime; // Assuming the endTime is available in the monitor object
+
+  //console.log(monitor)
+
+  // Calculate the duration based on endTime, or if endTime is not available, use the current time
+  const endMoment = endTime ? moment(endTime) : currentTime;
+  const duration = moment.duration(endMoment.diff(moment(monitor?.timestamp)));
   const hours = Math.floor(duration.asHours());
   const minutes = Math.floor(duration.asMinutes()) % 60;
   

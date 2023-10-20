@@ -202,6 +202,7 @@ function Dashboard() {
         setDown(response.data); 
            //console.log(response.data)
           setLoad5(false)
+          console.log(response.data)
       })
       .catch((error) => {
         console.error('Error fetching stats:', error);
