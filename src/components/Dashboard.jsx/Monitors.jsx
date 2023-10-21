@@ -104,7 +104,25 @@ const edit = async () => {
     
     <div className="all-monitors__item">
                             <div className="monitor">
-                              <div className="monitor__data"><span className="monitor__protocol">https</span><Link className="monitor__title" to="/monitor">{monitor?.name}</Link></div>
+                              <div className="monitor__data"><span className="monitor__protocol">
+                                {
+                                  monitor?.type == "web" && (<>
+                                    https
+                                  </>)
+                                }
+                                {
+                                  monitor?.type == "ping" && (<>
+                                    ping
+                                  </>)
+                                }
+                                {
+                                  monitor?.type == "port" && (<>
+                                    port
+                                  </>)
+                                }
+                                
+                                
+                                </span><Link className="monitor__title" to="/monitor">{monitor?.name}</Link></div>
                               <div className="monitor__additional">
                                 <div className="status-summary">
                           

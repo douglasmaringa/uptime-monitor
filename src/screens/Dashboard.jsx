@@ -202,7 +202,7 @@ function Dashboard() {
         setDown(response.data); 
            //console.log(response.data)
           setLoad5(false)
-          console.log(response.data)
+          //console.log(response.data)
       })
       .catch((error) => {
         console.error('Error fetching stats:', error);
@@ -249,7 +249,7 @@ function Dashboard() {
 
 
 
-
+ 
   // Calculate the duration in hours and minutes
   const duration = moment.duration(down?.duration);
   const durationInHours = duration.hours();
@@ -586,7 +586,10 @@ const[load6,setLoad6] = useState(false)
 
                   <div  className="all-monitors__body  tw-h-full">
                     <div className="all-monitors__search">
-                      <form className="search">
+                      <form onSubmit={(e)=>{
+                        e.preventDefault()
+                        setReload(!reload)
+                      }} className="search">
                                         <label className="field search__query field--wide field--size-md">
                                           <input value={searchText} onChange={(e)=>{setSearchText(e.target.value)}} type="text" placeholder="Name" name="input-name"/>
                                         </label>
@@ -654,9 +657,7 @@ const[load6,setLoad6] = useState(false)
                 <div className="monitors-events">
                   <header className="monitors-events__header">
                     <h2 className="monitors-events__title">Latest Events For All Monitors</h2>
-                    <div className="monitors-events__actions">
-                      <div className="monitors-events__actions-item"><a className="export-button" href="#"></a></div>
-                    </div>
+                   
                   </header>
 
                   <div  className="monitors-events__body">

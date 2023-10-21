@@ -2,7 +2,9 @@ import React from 'react';
 import moment from 'moment';
 
 function UptimeEvents({ status, monitor }) {
-  const createdAt = moment(monitor?.timestamp).format('YYYY-MM-DD HH:mm:ss');
+  console.log(monitor)
+  const createdAt = moment.utc(monitor?.timestamp).format('YYYY-MM-DD HH:mm:ss');
+
   const currentTime = moment();
   const endTime = monitor?.endTime; // Assuming the endTime is available in the monitor object
 
