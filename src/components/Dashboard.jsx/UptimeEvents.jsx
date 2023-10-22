@@ -1,12 +1,21 @@
-import React from 'react';
+import React,{useState} from 'react';
 import moment from 'moment';
+import 'react-tooltip/dist/react-tooltip.css'
+import { Tooltip } from 'react-tooltip'
 
 function UptimeEvents({ status, monitor }) {
-  console.log(monitor)
+  console.log(monitor.reason)
   const createdAt = moment.utc(monitor?.timestamp).format('YYYY-MM-DD HH:mm:ss');
 
   const currentTime = moment();
   const endTime = monitor?.endTime; // Assuming the endTime is available in the monitor object
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  function toggleExpansion() {
+    setIsExpanded(!isExpanded);
+  }
+  console.log(isExpanded)
+  
 
   //console.log(monitor)
 
@@ -44,18 +53,25 @@ function UptimeEvents({ status, monitor }) {
 
         <div className="events-table__col events-table__col--monitor">{monitor?.name}</div>
         <div className="events-table__col events-table__col--time">{createdAt}</div>
-        <div className="events-table__col events-table__col--reason">
+        <div className="events-table__col events-table__col--reason tw-flex">
           {
             monitor?.status === 'Uptime' && (
-              <div className="events-table__reason tw-text-green-500">OK (200)</div>
+              <div className="tw-my-auto events-table__reason tw-text-green-500">OK (200)</div>
             )
           }
           {
             monitor?.status === 'Downtime' && (
-              <div className="events-table__reason tw-text-red-500">Error (500)</div>
+              <div className="tw-my-auto events-table__reason tw-text-red-500">Error (500)</div>
             )
           }
+          <p className='tw-my-auto ml-2' data-tooltip-id="my-tooltip" data-tooltip-content={monitor?.reason}>
+          <img className='tw-w-5 tw-h-5 tw-rounded-2xl' src="eye.png" alt="" />
+          </p>
+          <Tooltip style={{whiteSpace:"pre-wrap"}} className='tw-w-[200px]' id="my-tooltip" />
         </div>
+
+    
+
         <div className="events-table__col events-table__col--duration">{`${hours} hrs, ${minutes} mins`}</div>
         <button className="events-table__responsive-opener" type="button"></button>
       </div>
