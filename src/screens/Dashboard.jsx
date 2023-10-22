@@ -419,21 +419,21 @@ const[load6,setLoad6] = useState(false)
                     <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
                     {
                         load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
-                           {percent?.uptimePercentage24h}%
+                           {percent?.uptimePercentage24h - percent?.downtimePercentage24h}%
                         </>)
                       }
                     </strong><span className="widget-uptime__stats-item-text">last 24 hours</span></li>
                     <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
                     {
                         load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
-                           {percent?.uptimePercentage7d}%
+                           {percent?.uptimePercentage7d - percent?.downtimePercentage7d}%
                         </>)
                       }
                     </strong><span className="widget-uptime__stats-item-text">last 7 days</span></li>
                     <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
                       {
                         load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
-                           {percent?.uptimePercentage30d}%
+                           {percent?.uptimePercentage30d - percent?.downtimePercentage30d}%
                         </>)
                       }
                     </strong><span className="widget-uptime__stats-item-text">last 30 days</span></li>
