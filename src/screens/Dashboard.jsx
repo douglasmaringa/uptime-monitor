@@ -420,32 +420,51 @@ const[load6,setLoad6] = useState(false)
                     <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
                     {
                         load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
-                           {Math.max(
-          (percent?.uptimePercentage24h - percent?.downtimePercentage24h).toFixed(2),
-          0
-        )}%
+                                 {
+                                  percent?.uptimePercentage24h > percent?.downtimePercentage24h ? (<>
+                                              {
+                                                Math.max(
+                                                  (percent?.uptimePercentage24h - percent?.downtimePercentage24h).toFixed(2),
+                                                  0)
+                                              }%
+                                  </>):(<>
+                                    {percent?.uptimePercentage24h}%
+                                  </>)
+                                 }
                         </>)
                       }
                     </strong><span className="widget-uptime__stats-item-text">last 24 hours</span></li>
                     <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
                     {
                         load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
-                           {Math.max(
-          (percent?.uptimePercentage7d - percent?.downtimePercentage7d).toFixed(2),
-          0
-        )}%
+                           {
+                                  percent?.uptimePercentage7d > percent?.downtimePercentage7d ? (<>
+                                              {
+                                                Math.max(
+                                                  (percent?.uptimePercentage7d - percent?.downtimePercentage7d).toFixed(2),
+                                                  0)
+                                              }%
+                                  </>):(<>
+                                    {percent?.uptimePercentage7d}%
+                                  </>)
+                                 }
                         </>)
                       }
                     </strong><span className="widget-uptime__stats-item-text">last 7 days</span></li>
                     <li className="widget-uptime__stats-item"><strong className="tw-text-4xl widget-uptime__stats-item-title">
-                      {
-                        load4 ? (<div className="tw-ml-2"><Loading2/></div>):(<>
-                           {Math.max(
-          (percent?.uptimePercentage30d - percent?.downtimePercentage30d).toFixed(2),
-          0
-        )}%
-                        </>)
-                      }
+                      
+                        {
+                          percent?.uptimePercentage30d > percent?.downtimePercentage24h ? (<>
+                                      {
+                                        Math.max(
+                                          (percent?.uptimePercentage30d - percent?.downtimePercentage30d).toFixed(2),
+                                          0)
+                                      }%
+                          </>):(<>
+                            {percent?.uptimePercentage30d}%
+                          </>)
+                         }
+                        
                     </strong><span className="widget-uptime__stats-item-text">last 30 days</span></li>
                   </ul>
                 </div>
