@@ -4,7 +4,7 @@ import 'react-tooltip/dist/react-tooltip.css'
 import { Tooltip } from 'react-tooltip'
 
 function UptimeEvents({ status, monitor }) {
-  console.log(status)
+  console.log(monitor.type)
   const createdAt = moment.utc(monitor?.timestamp).format('YYYY-MM-DD HH:mm:ss');
 
   const currentTime = moment();
@@ -24,6 +24,9 @@ function UptimeEvents({ status, monitor }) {
   const duration = moment.duration(endMoment.diff(moment(monitor?.timestamp)));
   const hours = Math.floor(duration.asHours());
   const minutes = Math.floor(duration.asMinutes()) % 60;
+
+
+  
   
   return (
     <div>
@@ -63,13 +66,19 @@ function UptimeEvents({ status, monitor }) {
             monitor?.status === 'Downtime' && (
               <div className="tw-my-auto events-table__reason tw-text-red-500">
                 {
-                  monitor?.type == "port" ? "Port Closed":"Error (500)"
+                  monitor?.type == "port" ? "Port Closed":""
+                }
+                {
+                  monitor?.ping == "web" ? "Unreachable":""
+                }
+                {
+                  monitor?.type == "web" ? (<>No (Down)</>):""
                 }
                 </div>
             )
           }
           {
-            monitor?.type != "port" && (<>
+            monitor?.type == "port" ? (<></>) : (<>
           <p className='tw-my-auto ml-2' data-tooltip-id="my-tooltip" data-tooltip-content={monitor?.reason}>
           <img className='tw-w-5 tw-h-5 tw-rounded-2xl' src="eye.png" alt="" />
           </p>

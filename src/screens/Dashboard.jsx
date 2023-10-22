@@ -482,7 +482,7 @@ const[load6,setLoad6] = useState(false)
                 {
                   down?.obj?.monitor?.type === 'web' && down?.obj?.availability == "Down"  && (
                   <div className="widget-downtime__text">
-                    <p>The last downtime recorded was on {moment(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} UTC (for the monitor&nbsp;{down?.name}) and lasted {durationInHours} hrs, {durationInMinutes} mins </p>
+                    <p>The last downtime recorded was on {moment.utc(down?.timestamp).format('YYYY-MM-DD HH:mm:ss')} UTC (for the monitor&nbsp;{down?.name}) and lasted {durationInHours} hrs, {durationInMinutes} mins </p>
                   </div>
                   )
                 }
