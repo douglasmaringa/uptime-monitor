@@ -79,9 +79,7 @@ function CreateContacts({ close, toast, reload, setReload }) {
                             onChange={handleInputChange}
                           >
                             <option value="email">Email</option>
-                            <option value="sms" disabled>
-                              SMS (Not Available)
-                            </option>
+                            
                           </select>
                         </div>
                       </div>

@@ -924,8 +924,8 @@ const[load6,setLoad6] = useState(false)
       <div className="layout__footer">
         <div className="dashboard-footer">
           <div className="wrapper">
-            <div className="dashboard-footer__copy">2017 © Uptime Engineer. All Rights Reserved.</div>
-            <nav className="footer-nav"><a className="footer-nav__item" href="#">FAQ</a><a className="footer-nav__item" href="#">Privacy</a><a className="footer-nav__item" href="#">Policy</a><a className="footer-nav__item" href="#">Terms & Condition</a></nav>
+            <div className="dashboard-footer__copy">2023 © Deploy2K LLC. All Rights Reserved.</div>
+            
           </div>
         </div>
       </div>
